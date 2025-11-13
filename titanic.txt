@@ -1,0 +1,84 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+
+
+
+
+
+data = pd.read_csv("Titanic.csv")
+
+
+
+
+
+
+
+df = data.copy()
+
+
+
+
+
+df = df.drop(columns=['PassengerId', 'Name', 'Ticket', 'Cabin'])
+
+
+
+
+df['Age'].fillna(df['Age'].median(), inplace=True)
+df['Embarked'].fillna(df['Embarked'].mode()[0], inplace=True)
+
+
+
+
+
+le_sex = LabelEncoder()
+le_embarked = LabelEncoder()
+df['Sex'] = le_sex.fit_transform(df['Sex'])
+df['Embarked'] = le_embarked.fit_transform(df['Embarked'])
+
+
+
+X = df.drop(columns=['Survived'])
+y = df['Survived']
+
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+
+
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+
+
+
+
+
+y_pred = model.predict(X_test)
+
+
+
+
+
+
+
+acc = accuracy_score(y_test, y_pred)
+conf_matrix = confusion_matrix(y_test, y_pred)
+
+print(" Confusion Matrix:\n", conf_matrix)
+print(f"\n Accuracy: {acc*100:.2f}%")
+print("\n Classification Report:\n", classification_report(y_test, y_pred))
+
+
+
+
